@@ -4,15 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Transit Lobby Display</title>
-
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
       background: #0a0f1e;
@@ -22,8 +17,6 @@
       display: flex;
       flex-direction: column;
     }
-
-    /* ── Header ── */
     header {
       display: flex;
       align-items: center;
@@ -33,43 +26,13 @@
       border-bottom: 2px solid #1e3a6e;
       flex-shrink: 0;
       z-index: 1000;
+      position: relative;
     }
-    header h1 {
-      font-size: 1.4rem;
-      letter-spacing: 2px;
-      color: #7ec8f5;
-      text-transform: uppercase;
-    }
-    #clock {
-      font-size: 1.6rem;
-      font-weight: bold;
-      color: #fff;
-      font-variant-numeric: tabular-nums;
-    }
-    #last-update {
-      font-size: 0.75rem;
-      color: #5a8aaa;
-      text-align: right;
-    }
-
-    /* ── Main layout ── */
-    .main {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    /* ── Map ── */
-    #map {
-      flex: 1;
-      min-width: 0;
-      z-index: 1;
-    }
-
-    /* Dark Leaflet tiles overlay */
-    .leaflet-tile-pane { filter: brightness(0.85) saturate(0.9); }
-
-    /* ── Sidebar ── */
+    header h1 { font-size: 1.4rem; letter-spacing: 2px; color: #7ec8f5; text-transform: uppercase; }
+    #clock { font-size: 1.6rem; font-weight: bold; font-variant-numeric: tabular-nums; }
+    #last-update { font-size: 0.75rem; color: #5a8aaa; text-align: right; }
+    .main { display: flex; flex: 1; overflow: hidden; }
+    #map { flex: 1; min-width: 0; }
     .sidebar {
       width: 310px;
       flex-shrink: 0;
@@ -82,7 +45,6 @@
       gap: 10px;
       z-index: 1000;
     }
-
     .sidebar-title {
       font-size: 0.7rem;
       letter-spacing: 3px;
@@ -92,162 +54,71 @@
       padding-bottom: 8px;
       border-bottom: 1px solid #1e3a6e;
     }
-
-    /* ── Route Card ── */
     .route-card {
       background: #111c35;
       border-radius: 10px;
       overflow: hidden;
       border: 1px solid #1e3a6e;
     }
-
-    .route-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-    }
-
+    .route-header { display: flex; align-items: center; gap: 10px; padding: 9px 12px; }
     .route-badge {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 1rem;
-      flex-shrink: 0;
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1rem; flex-shrink: 0;
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
-
     .route-info h2 {
-      font-size: 0.82rem;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 215px;
+      font-size: 0.82rem; font-weight: 700;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 215px;
     }
-
-    .route-info .status-line {
-      font-size: 0.7rem;
-      color: #7ec8f5;
-      margin-top: 2px;
-    }
-
-    .stop-section {
-      border-top: 1px solid #1e3a6e;
-      padding: 8px 12px 10px;
-    }
-
-    .stop-label {
-      font-size: 0.62rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: #5a8aaa;
-      margin-bottom: 4px;
-    }
-
-    .next-stop-name {
-      font-size: 0.95rem;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .eta-row {
-      display: flex;
-      align-items: baseline;
-      gap: 6px;
-      margin-top: 4px;
-    }
-
-    .eta-minutes {
-      font-size: 1.8rem;
-      font-weight: 900;
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
-    }
-
+    .route-info .status-line { font-size: 0.7rem; color: #7ec8f5; margin-top: 2px; }
+    .stop-section { border-top: 1px solid #1e3a6e; padding: 8px 12px 10px; }
+    .stop-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 2px; color: #5a8aaa; margin-bottom: 4px; }
+    .next-stop-name { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .eta-row { display: flex; align-items: baseline; gap: 6px; margin-top: 4px; }
+    .eta-minutes { font-size: 1.8rem; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
     .eta-label { font-size: 0.75rem; color: #7ec8f5; }
-
     .eta-now    { color: #ff4d4d; }
     .eta-soon   { color: #f7c224; }
     .eta-ok     { color: #5fb406; }
     .eta-future { color: #2e9afe; }
-
-    .progress-bar-wrap {
-      margin-top: 6px;
-      background: #1e3a6e;
-      border-radius: 4px;
-      height: 5px;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 1s linear;
-    }
-
+    .progress-bar-wrap { margin-top: 6px; background: #1e3a6e; border-radius: 4px; height: 5px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 1s linear; }
     .no-bus { font-size: 0.8rem; color: #5a8aaa; font-style: italic; padding: 4px 0 2px; }
-
-    /* Scrollbar */
     .sidebar::-webkit-scrollbar { width: 4px; }
     .sidebar::-webkit-scrollbar-track { background: #0a0f1e; }
     .sidebar::-webkit-scrollbar-thumb { background: #1e3a6e; border-radius: 2px; }
-
-    /* ── Ticker ── */
     .ticker-bar {
       background: #060c1a;
       border-top: 1px solid #1e3a6e;
       overflow: hidden;
       white-space: nowrap;
       flex-shrink: 0;
-      height: 26px;
-      line-height: 26px;
-      font-size: 0.72rem;
-      color: #5a8aaa;
-      z-index: 1000;
+      height: 26px; line-height: 26px;
+      font-size: 0.72rem; color: #5a8aaa;
+      z-index: 1000; position: relative;
     }
     .ticker-inner {
       display: inline-block;
       animation: ticker 90s linear infinite;
       padding-left: 100%;
     }
-    @keyframes ticker {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
-    }
-
-    /* Leaflet bus marker popup */
-    .leaflet-popup-content-wrapper {
-      background: #111c35;
-      color: #fff;
-      border: 1px solid #1e3a6e;
-      border-radius: 8px;
-    }
+    @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    .leaflet-popup-content-wrapper { background: #111c35; color: #fff; border: 1px solid #1e3a6e; border-radius: 8px; }
     .leaflet-popup-tip { background: #111c35; }
+    .stop-tooltip { font-size: 0.75rem; }
   </style>
 </head>
 <body>
-
 <header>
-  <div>
-    <h1>&#128652; Live Bus Tracker</h1>
-  </div>
+  <div><h1>&#128652; Live Bus Tracker</h1></div>
   <div style="text-align:right;">
     <div id="clock">--:-- --</div>
     <div id="last-update">Loading&hellip;</div>
   </div>
 </header>
-
 <div class="main">
-  <!-- Leaflet map -->
   <div id="map"></div>
-
-  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-title">Next Stop &middot; All Routes</div>
     <div id="route-cards">
@@ -255,18 +126,14 @@
     </div>
   </aside>
 </div>
-
 <div class="ticker-bar">
   <span class="ticker-inner" id="ticker-text">Connecting to TransitFare&hellip;</span>
 </div>
 
 <script>
-/* ══════════════════════════════════════
-   CONFIG
-══════════════════════════════════════ */
 const AGENCY_ID  = 31;
-/* CORS proxy – relays requests from github.io to transitfare.com */
-const PROXY      = 'https://corsproxy.io/?url=';
+/* allorigins wraps JSON in { contents: "..." } string – parse accordingly */
+const PROXY      = 'https://api.allorigins.win/get?url=';
 const API_BASE   = 'https://america.transitfare.com/api/1/public';
 const REFRESH_MS = 60000;
 
@@ -286,236 +153,171 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-/* ── Leaflet map init ── */
-const map = L.map('map', { zoomControl: true }).setView([30.22392, -93.21792], 13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors',
-  maxZoom: 19,
+/* ── Leaflet map ── */
+const map = L.map('map',{zoomControl:true}).setView([30.22392,-93.21792],13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution:'&copy; OpenStreetMap contributors',maxZoom:19
 }).addTo(map);
 
-/* Store route polylines and bus markers */
 const routePolylines = {};
 const busMarkers = {};
 
-/* ── API fetch via CORS proxy ── */
+/* ── CORS-proxy fetch (allorigins) ── */
 async function apiFetch(path) {
-  const url = PROXY + encodeURIComponent(API_BASE + path);
-  const res = await fetch(url);
+  const target = API_BASE + path;
+  const res    = await fetch(PROXY + encodeURIComponent(target));
   if (!res.ok) throw new Error('HTTP ' + res.status);
-  return res.json();
+  const wrapper = await res.json();
+  return JSON.parse(wrapper.contents);
 }
 
-function todayDate() {
-  return new Date().toISOString().split('T')[0];
-}
+function todayDate() { return new Date().toISOString().split('T')[0]; }
 
-function stopTimeToDate(timeStr) {
-  const [h, m, s] = timeStr.split(':').map(Number);
+function stopTimeToDate(t) {
+  const [h,m,s] = t.split(':').map(Number);
   const d = new Date();
-  d.setHours(h, m, s || 0, 0);
+  d.setHours(h, m, s||0, 0);
   return d;
 }
 
 function etaClass(min) {
-  if (min <= 1) return 'eta-now';
-  if (min <= 5) return 'eta-soon';
-  if (min <= 15) return 'eta-ok';
+  if (min<=1)  return 'eta-now';
+  if (min<=5)  return 'eta-soon';
+  if (min<=15) return 'eta-ok';
   return 'eta-future';
 }
 
-/* ── Draw route shapes on map ── */
-async function drawRoutes(shapesData, routesData) {
-  /* Build route colour lookup */
-  const routeColours = {};
-  routesData.forEach(r => { routeColours[r.routeNumber] = r.colour || '#888'; });
+/* ── Draw route polylines ── */
+function drawRoutes(shapesData, routesData) {
+  const colourMap = {};
+  routesData.forEach(r => { colourMap[r.shapeNumber] = { colour: r.colour||'#888', num: r.routeNumber }; });
 
-  /* Group shapes by shapeNumber */
-  const shapeGroups = {};
+  const groups = {};
   shapesData.forEach(pt => {
     const key = pt.shapeId || pt.shapeNumber || pt.shape_id;
-    if (!shapeGroups[key]) shapeGroups[key] = [];
-    shapeGroups[key].push([pt.latitude || pt.lat, pt.longitude || pt.lon || pt.lng]);
+    if (!groups[key]) groups[key] = [];
+    groups[key].push([parseFloat(pt.latitude||pt.lat), parseFloat(pt.longitude||pt.lon||pt.lng)]);
   });
 
-  /* Match shapes to routes */
-  routesData.forEach(route => {
-    if (route.routeNumber > 5) return; /* skip para-transit */
-    const shapeKey = route.shapeNumber;
-    const coords = shapeGroups[shapeKey];
-    if (!coords || !coords.length) return;
-    const line = L.polyline(coords, {
-      color: route.colour || '#888',
-      weight: 5,
-      opacity: 0.85,
-    }).addTo(map);
-    routePolylines[route.routeNumber] = line;
+  Object.entries(groups).forEach(([key, coords]) => {
+    const info = colourMap[parseInt(key)];
+    if (!info || info.num > 5) return;
+    if (!routePolylines[key]) {
+      routePolylines[key] = L.polyline(coords,{color:info.colour,weight:5,opacity:0.85}).addTo(map);
+    }
   });
 }
 
-/* ── Draw stops on map ── */
-function drawStops(stopsData, stopNumbers) {
-  const activeSet = new Set(stopNumbers.map(String));
-  stopsData.forEach(stop => {
-    if (!stop.latitude) return;
-    const isActive = activeSet.has(String(stop.stopNumber));
-    if (!isActive) return; /* only draw stops on active routes */
-    L.circleMarker([stop.latitude, stop.longitude], {
-      radius: 4,
-      color: '#fff',
-      weight: 1,
-      fillColor: '#1e3a6e',
-      fillOpacity: 0.9,
-    }).bindTooltip(stop.stopName, { direction: 'top', className: 'stop-tooltip' }).addTo(map);
+/* ── Draw stop markers ── */
+function drawStops(stopsData, activeNums) {
+  const set = new Set(activeNums.map(String));
+  stopsData.forEach(s => {
+    if (!s.latitude || !set.has(String(s.stopNumber))) return;
+    L.circleMarker([s.latitude,s.longitude],{
+      radius:4,color:'#fff',weight:1,fillColor:'#1e3a6e',fillOpacity:0.9
+    }).bindTooltip(s.stopName,{direction:'top',className:'stop-tooltip'}).addTo(map);
   });
 }
 
-/* ── Create SVG bus icon ── */
-function busIcon(colour, textColour, routeNum) {
+/* ── SVG bus icon ── */
+function busIcon(colour,text,num) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
     <circle cx="18" cy="18" r="17" fill="${colour}" stroke="#fff" stroke-width="2"/>
     <text x="18" y="23" text-anchor="middle" font-size="14" font-weight="900"
-          font-family="Arial,sans-serif" fill="${textColour}">${routeNum}</text>
-  </svg>`;
-  return L.divIcon({
-    html: svg,
-    className: '',
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
-    popupAnchor: [0, -20],
-  });
+          font-family="Arial,sans-serif" fill="${text}">${num}</text></svg>`;
+  return L.divIcon({html:svg,className:'',iconSize:[36,36],iconAnchor:[18,18],popupAnchor:[0,-20]});
 }
 
-/* ── Fetch route data and update sidebar ── */
+/* ── Main data fetch + render ── */
 async function fetchAndRender() {
   const [stopsArr, routesArr, tripsArr, shapesArr] = await Promise.all([
-    apiFetch('/stops/' + AGENCY_ID),
-    apiFetch('/routes/0/' + AGENCY_ID),
-    apiFetch('/scheduledTrips/' + todayDate() + '/' + AGENCY_ID),
-    apiFetch('/shapes/' + AGENCY_ID),
+    apiFetch('/stops/'           + AGENCY_ID),
+    apiFetch('/routes/0/'        + AGENCY_ID),
+    apiFetch('/scheduledTrips/'  + todayDate() + '/' + AGENCY_ID),
+    apiFetch('/shapes/'          + AGENCY_ID),
   ]);
 
-  /* Build stop lookup */
   const stopMap = {};
   stopsArr.forEach(s => { stopMap[String(s.stopNumber)] = s; });
 
-  /* Draw routes on first load */
-  if (Object.keys(routePolylines).length === 0) {
-    drawRoutes(shapesArr, routesArr);
-  }
+  if (Object.keys(routePolylines).length === 0) drawRoutes(shapesArr, routesArr);
 
-  const now = new Date();
+  const now     = new Date();
   const results = [];
-  const activeStopNums = [];
+  const activeNums = [];
 
   for (const route of ROUTES) {
-    const routeTrips = tripsArr
+    const trips = tripsArr
       .filter(t => String(t.routeNumber) === String(route.number))
-      .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+      .sort((a,b) => new Date(a.startTime)-new Date(b.startTime));
 
-    let activeTrip   = null;
-    let nextStopName = null;
-    let etaMinutes   = null;
-    let tripStatus   = 'No scheduled trips';
-    let progressPct  = 0;
-    let busLat       = null;
-    let busLon       = null;
+    let activeTrip=null, nextStopName=null, etaMinutes=null;
+    let tripStatus='No scheduled trips', progressPct=0;
+    let busLat=null, busLon=null;
 
-    for (const trip of routeTrips) {
-      const start = new Date(trip.startTime);
-      const end   = new Date(trip.endTime);
-      if (now >= start && now <= end) {
-        activeTrip  = trip;
-        tripStatus  = 'On route';
-        break;
-      }
-      if (now < start) {
-        activeTrip  = trip;
-        tripStatus  = 'Next: ' + start.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-        break;
-      }
+    for (const trip of trips) {
+      const start = new Date(trip.startTime), end = new Date(trip.endTime);
+      if (now>=start && now<=end) { activeTrip=trip; tripStatus='On route'; break; }
+      if (now<start)  { activeTrip=trip; tripStatus='Next: '+start.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); break; }
     }
 
     if (activeTrip) {
-      const stops = activeTrip.stopTimes || [];
-      let nextStop = null;
-
-      /* Find next upcoming stop */
-      for (const st of stops) {
+      const stopTimes = activeTrip.stopTimes || [];
+      let nextSt = null;
+      for (const st of stopTimes) {
         if (!st.arrivalTime) continue;
-        const arrDate = stopTimeToDate(st.arrivalTime);
-        if (arrDate > now) { nextStop = st; break; }
+        if (stopTimeToDate(st.arrivalTime) > now) { nextSt=st; break; }
       }
-      if (!nextStop && stops.length) nextStop = stops[0];
+      if (!nextSt && stopTimes.length) nextSt = stopTimes[0];
 
-      if (nextStop) {
-        const stopInfo = stopMap[String(nextStop.stopNumber)];
-        nextStopName = stopInfo ? stopInfo.stopName : 'Stop #' + nextStop.stopNumber;
-        if (stopInfo) {
-          busLat = stopInfo.latitude;
-          busLon = stopInfo.longitude;
-          activeStopNums.push(nextStop.stopNumber);
+      if (nextSt) {
+        const info = stopMap[String(nextSt.stopNumber)];
+        nextStopName = info ? info.stopName : 'Stop #'+nextSt.stopNumber;
+        if (info) { busLat=info.latitude; busLon=info.longitude; activeNums.push(nextSt.stopNumber); }
+        if (nextSt.arrivalTime) {
+          etaMinutes = Math.max(0, Math.round((stopTimeToDate(nextSt.arrivalTime)-now)/60000));
         }
-
-        if (nextStop.arrivalTime) {
-          const arrDate = stopTimeToDate(nextStop.arrivalTime);
-          etaMinutes = Math.max(0, Math.round((arrDate - now) / 60000));
-        }
-
-        const tripStart  = new Date(activeTrip.startTime);
-        const tripEnd    = new Date(activeTrip.endTime);
-        progressPct = Math.min(100, Math.max(0,
-          Math.round((now - tripStart) / (tripEnd - tripStart) * 100)));
+        const s=new Date(activeTrip.startTime), e=new Date(activeTrip.endTime);
+        progressPct = Math.min(100,Math.max(0,Math.round((now-s)/(e-s)*100)));
       }
-
-      /* Collect all stops for this active trip */
-      stops.forEach(st => activeStopNums.push(st.stopNumber));
+      stopTimes.forEach(st => activeNums.push(st.stopNumber));
     }
 
-    /* Update bus marker on map */
+    /* Update/create bus marker */
     if (busLat && busLon) {
       const icon = busIcon(route.colour, route.text, route.number);
       if (busMarkers[route.number]) {
-        busMarkers[route.number].setLatLng([busLat, busLon]).setIcon(icon);
+        busMarkers[route.number].setLatLng([busLat,busLon]).setIcon(icon);
       } else {
-        busMarkers[route.number] = L.marker([busLat, busLon], { icon })
-          .bindPopup('<b>Route ' + route.number + '</b><br>' + (nextStopName || ''))
+        busMarkers[route.number] = L.marker([busLat,busLon],{icon})
+          .bindPopup('<b>Route '+route.number+'</b><br>'+(nextStopName||''))
           .addTo(map);
       }
     }
 
-    results.push({ route, nextStopName, etaMinutes, tripStatus, progressPct });
+    results.push({route,nextStopName,etaMinutes,tripStatus,progressPct});
   }
 
-  /* Draw stops on first call */
-  if (!window._stopsDrawn) {
-    drawStops(stopsArr, activeStopNums);
-    window._stopsDrawn = true;
-  }
+  if (!window._stopsDrawn) { drawStops(stopsArr,activeNums); window._stopsDrawn=true; }
 
   renderCards(results);
   updateTicker(results);
-
   document.getElementById('last-update').textContent =
-    'Updated ' + new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    'Updated '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
 
-/* ── Render sidebar cards ── */
+/* ── Render route cards ── */
 function renderCards(results) {
-  const container = document.getElementById('route-cards');
-  container.innerHTML = '';
-
-  results.forEach(({ route, nextStopName, etaMinutes, tripStatus, progressPct }) => {
-    const card   = document.createElement('div');
+  const c = document.getElementById('route-cards');
+  c.innerHTML = '';
+  results.forEach(({route,nextStopName,etaMinutes,tripStatus,progressPct}) => {
+    const card = document.createElement('div');
     card.className = 'route-card';
-
-    const etaC   = etaMinutes !== null ? etaClass(etaMinutes) : 'eta-future';
-    const etaNum = etaMinutes !== null ? (etaMinutes === 0 ? '&#9733;' : etaMinutes) : '&mdash;';
-    const progressBar = nextStopName
-      ? `<div class="progress-bar-wrap">
-           <div class="progress-bar-fill" style="width:${progressPct}%;background:${route.colour};"></div>
-         </div>`
+    const etaC   = etaMinutes!==null ? etaClass(etaMinutes) : 'eta-future';
+    const etaNum = etaMinutes!==null ? (etaMinutes===0?'&#9733;':etaMinutes) : '&mdash;';
+    const bar    = nextStopName
+      ? `<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${progressPct}%;background:${route.colour};"></div></div>`
       : '';
-
     card.innerHTML = `
       <div class="route-header">
         <div class="route-badge" style="background:${route.colour};color:${route.text};">${route.number}</div>
@@ -530,36 +332,31 @@ function renderCards(results) {
           ? `<div class="next-stop-name">${nextStopName}</div>
              <div class="eta-row">
                <span class="eta-minutes ${etaC}">${etaNum}</span>
-               <span class="eta-label">${etaMinutes === 0 ? 'Arriving' : 'min away'}</span>
-             </div>
-             ${progressBar}`
+               <span class="eta-label">${etaMinutes===0?'Arriving':'min away'}</span>
+             </div>${bar}`
           : `<div class="no-bus">${tripStatus}</div>`
         }
-      </div>
-    `;
-    container.appendChild(card);
+      </div>`;
+    c.appendChild(card);
   });
 }
 
 /* ── Ticker ── */
 function updateTicker(results) {
-  const parts = results.map(({ route, nextStopName, etaMinutes }) => {
-    const eta = etaMinutes !== null ? etaMinutes + ' min' : 'TBD';
-    return `Route ${route.number}: ${nextStopName || 'No active trip'} – ${eta}`;
-  });
-  document.getElementById('ticker-text').textContent = parts.join('   ·   ');
+  document.getElementById('ticker-text').textContent =
+    results.map(({route,nextStopName,etaMinutes}) =>
+      `Route ${route.number}: ${nextStopName||'No active trip'} – ${etaMinutes!==null?etaMinutes+' min':'TBD'}`
+    ).join('   ·   ');
 }
 
-/* ── Main loop ── */
+/* ── Loop ── */
 async function refresh() {
-  try {
-    await fetchAndRender();
-  } catch (err) {
-    console.error('Refresh error:', err);
-    document.getElementById('last-update').textContent = 'Update failed – retrying in 60s';
+  try { await fetchAndRender(); }
+  catch(e) {
+    console.error('Refresh error:',e);
+    document.getElementById('last-update').textContent='Update failed – retrying in 60s';
   }
 }
-
 refresh();
 setInterval(refresh, REFRESH_MS);
 </script>
