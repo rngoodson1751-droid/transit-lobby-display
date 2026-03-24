@@ -1,289 +1,329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Transit Lobby Display</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #0a0f1e; color: #fff; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-    header { display: flex; align-items: center; justify-content: space-between; background: #0d1526; padding: 10px 20px; border-bottom: 2px solid #1e3a6e; flex-shrink: 0; position: relative; z-index: 1000; }
-    header h1 { font-size: 1.4rem; letter-spacing: 2px; color: #7ec8f5; text-transform: uppercase; }
-    #clock { font-size: 1.6rem; font-weight: bold; font-variant-numeric: tabular-nums; }
-    #last-update { font-size: 0.75rem; color: #5a8aaa; text-align: right; }
-    .main { display: flex; flex: 1; overflow: hidden; }
-    #map { flex: 1; min-width: 0; }
-    .sidebar { width: 310px; flex-shrink: 0; background: #0d1526; border-left: 2px solid #1e3a6e; overflow-y: auto; padding: 12px 10px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
-    .sidebar-title { font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: #5a8aaa; text-align: center; padding-bottom: 8px; border-bottom: 1px solid #1e3a6e; }
-    .route-card { background: #111c35; border-radius: 10px; overflow: hidden; border: 1px solid #1e3a6e; }
-    .route-header { display: flex; align-items: center; gap: 10px; padding: 9px 12px; }
-    .route-badge { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1rem; flex-shrink: 0; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-    .route-info h2 { font-size: 0.82rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 215px; }
-    .route-info .status-line { font-size: 0.7rem; color: #7ec8f5; margin-top: 2px; }
-    .stop-section { border-top: 1px solid #1e3a6e; padding: 8px 12px 10px; }
-    .stop-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 2px; color: #5a8aaa; margin-bottom: 4px; }
-    .next-stop-name { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .eta-row { display: flex; align-items: baseline; gap: 6px; margin-top: 4px; }
-    .eta-minutes { font-size: 1.8rem; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1; }
-    .eta-label { font-size: 0.75rem; color: #7ec8f5; }
-    .eta-now { color: #ff4d4d; } .eta-soon { color: #f7c224; } .eta-ok { color: #5fb406; } .eta-future { color: #2e9afe; }
-    .progress-bar-wrap { margin-top: 6px; background: #1e3a6e; border-radius: 4px; height: 5px; overflow: hidden; }
-    .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 1s linear; }
-    .no-bus { font-size: 0.8rem; color: #5a8aaa; font-style: italic; padding: 4px 0 2px; }
-    .sidebar::-webkit-scrollbar { width: 4px; } .sidebar::-webkit-scrollbar-track { background: #0a0f1e; } .sidebar::-webkit-scrollbar-thumb { background: #1e3a6e; border-radius: 2px; }
-    .ticker-bar { background: #060c1a; border-top: 1px solid #1e3a6e; overflow: hidden; white-space: nowrap; flex-shrink: 0; height: 26px; line-height: 26px; font-size: 0.72rem; color: #5a8aaa; position: relative; z-index: 1000; }
-    .ticker-inner { display: inline-block; animation: ticker 90s linear infinite; padding-left: 100%; }
-    @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-    .leaflet-popup-content-wrapper { background: #111c35; color: #fff; border: 1px solid #1e3a6e; border-radius: 8px; } .leaflet-popup-tip { background: #111c35; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0f1e;color:#fff;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+    header{display:flex;align-items:center;justify-content:space-between;background:#0d1526;padding:10px 20px;border-bottom:2px solid #1e3a6e;flex-shrink:0;z-index:1000;position:relative}
+    header h1{font-size:1.4rem;letter-spacing:2px;color:#7ec8f5;text-transform:uppercase}
+    #clock{font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+    #last-update{font-size:.75rem;color:#5a8aaa;text-align:right}
+    .main{display:flex;flex:1;overflow:hidden}
+    #map{flex:1;min-width:0}
+    .sidebar{width:310px;flex-shrink:0;background:#0d1526;border-left:2px solid #1e3a6e;overflow-y:auto;padding:12px 10px;display:flex;flex-direction:column;gap:10px;z-index:1000}
+    .sidebar-title{font-size:.7rem;letter-spacing:3px;text-transform:uppercase;color:#5a8aaa;text-align:center;padding-bottom:8px;border-bottom:1px solid #1e3a6e}
+    .route-card{background:#111c35;border-radius:10px;overflow:hidden;border:1px solid #1e3a6e}
+    .route-header{display:flex;align-items:center;gap:10px;padding:9px 12px}
+    .route-badge{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;flex-shrink:0;box-shadow:0 0 10px rgba(0,0,0,.5)}
+    .route-info h2{font-size:.82rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:215px}
+    .route-info .sl{font-size:.7rem;color:#7ec8f5;margin-top:2px}
+    .stop-sec{border-top:1px solid #1e3a6e;padding:8px 12px 10px}
+    .stop-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:2px;color:#5a8aaa;margin-bottom:4px}
+    .next-sn{font-size:.95rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .eta-row{display:flex;align-items:baseline;gap:6px;margin-top:4px}
+    .eta-num{font-size:1.8rem;font-weight:900;font-variant-numeric:tabular-nums;line-height:1}
+    .eta-lbl{font-size:.75rem;color:#7ec8f5}
+    .en{color:#ff4d4d}.es{color:#f7c224}.eo{color:#5fb406}.ef{color:#2e9afe}
+    .pb-w{margin-top:6px;background:#1e3a6e;border-radius:4px;height:5px;overflow:hidden}
+    .pb-f{height:100%;border-radius:4px;transition:width 1s linear}
+    .no-bus{font-size:.8rem;color:#5a8aaa;font-style:italic;padding:4px 0 2px}
+    .sidebar::-webkit-scrollbar{width:4px}
+    .sidebar::-webkit-scrollbar-track{background:#0a0f1e}
+    .sidebar::-webkit-scrollbar-thumb{background:#1e3a6e;border-radius:2px}
+    .ticker{background:#060c1a;border-top:1px solid #1e3a6e;overflow:hidden;white-space:nowrap;flex-shrink:0;height:26px;line-height:26px;font-size:.72rem;color:#5a8aaa;position:relative;z-index:1000}
+    .ticker-i{display:inline-block;animation:tk 90s linear infinite;padding-left:100%}
+    @keyframes tk{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+    .leaflet-popup-content-wrapper{background:#111c35;color:#fff;border:1px solid #1e3a6e;border-radius:8px}
+    .leaflet-popup-tip{background:#111c35}
+    #status-msg{position:absolute;bottom:4px;right:20px;font-size:.65rem;color:#3a5a7a}
   </style>
 </head>
 <body>
 <header>
   <div><h1>&#128652; Live Bus Tracker</h1></div>
-  <div style="text-align:right;"><div id="clock">--:-- --</div><div id="last-update">Loading&hellip;</div></div>
+  <div style="text-align:right">
+    <div id="clock">--:-- --</div>
+    <div id="last-update">Starting up&hellip;</div>
+  </div>
+  <div id="status-msg"></div>
 </header>
 <div class="main">
   <div id="map"></div>
   <aside class="sidebar">
     <div class="sidebar-title">Next Stop &middot; All Routes</div>
-    <div id="route-cards"><div style="text-align:center;color:#5a8aaa;padding:20px;font-size:0.8rem;">Loading&hellip;</div></div>
+    <div id="cards"><div style="text-align:center;color:#5a8aaa;padding:20px;font-size:.8rem">Loading route data&hellip;</div></div>
   </aside>
 </div>
-<div class="ticker-bar"><span class="ticker-inner" id="ticker-text">Connecting to TransitFare&hellip;</span></div>
+<div class="ticker"><span class="ticker-i" id="ticker">Connecting to TransitFare&hellip;</span></div>
 
 <script>
-const AGENCY_ID  = 31;
-const PROXY      = 'https://api.allorigins.win/get?url=';
-const API_BASE   = 'https://america.transitfare.com/api/1/public';
-const REFRESH_MS = 60000;
+/* ═══════════════════════════════════════════
+   CONFIGURATION — adjust to your schedule
+═══════════════════════════════════════════ */
+const AGENCY      = 31;
+const PROXY       = 'https://api.allorigins.win/get?url=';
+const BASE        = 'https://america.transitfare.com/api/1/public';
+const REFRESH_MS  = 60000;       // sidebar refresh interval
+const MAP_REFRESH = 300000;      // re-fetch static map data every 5 min
 
-/* Adjust to your actual daily schedule */
-const FIRST_TRIP_HOUR   = 5;
-const FIRST_TRIP_MINUTE = 45;
-const TRIP_INTERVAL_MIN = 60;
-const LAST_TRIP_HOUR    = 19;
+/* Service hours (America/Chicago — adjust if needed) */
+const FIRST_H = 5, FIRST_M = 45;   /* 5:45 AM first departure  */
+const INTERVAL= 60;                  /* minutes between trips     */
+const LAST_H  = 19;                  /* last departure hour       */
 
-const ROUTES_META = [
-  { number:1, name:'Route 1 - Kirkman/University', colour:'#ff0000', text:'#fff' },
-  { number:2, name:'Route 2 - Simmons and Prater', colour:'#ff6600', text:'#fff' },
-  { number:3, name:'Route 3 - Mill Street',        colour:'#f7c224', text:'#000' },
-  { number:4, name:'Route 4 - Oak Park',           colour:'#5fb406', text:'#fff' },
-  { number:5, name:'Route 5 Nelson Road',          colour:'#2e9afe', text:'#fff' },
+const ROUTES = [
+  {n:1, name:'Route 1 – Kirkman/University', c:'#ff0000', t:'#fff'},
+  {n:2, name:'Route 2 – Simmons & Prater',   c:'#ff6600', t:'#fff'},
+  {n:3, name:'Route 3 – Mill Street',         c:'#f7c224', t:'#000'},
+  {n:4, name:'Route 4 – Oak Park',            c:'#5fb406', t:'#fff'},
+  {n:5, name:'Route 5 – Nelson Road',         c:'#2e9afe', t:'#fff'},
 ];
 
-function updateClock() {
-  document.getElementById('clock').textContent =
-    new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-}
-setInterval(updateClock, 1000);
-updateClock();
+/* ── Clock ── */
+const clockEl = document.getElementById('clock');
+function tick(){ clockEl.textContent = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+setInterval(tick, 1000); tick();
 
+/* ── Map ── */
 const map = L.map('map',{zoomControl:true}).setView([30.22392,-93.21792],13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   attribution:'&copy; OpenStreetMap contributors', maxZoom:19
 }).addTo(map);
 
-const routePolylines = {};
-const busMarkers = {};
+const polylines = {}, markers = {};
+let stopMap = {}, routesData = [], stopsData = [];
+let mapDataLoaded = false;
 
-async function apiFetch(path) {
-  const r = await fetch(PROXY + encodeURIComponent(API_BASE + path));
-  if (!r.ok) throw new Error('HTTP ' + r.status + ' for ' + path);
-  const w = await r.json();
-  return JSON.parse(w.contents);
+/* ── Fetch with retry ── */
+async function fetchJSON(path, retries=3){
+  const url = PROXY + encodeURIComponent(BASE + path);
+  for(let i=0;i<retries;i++){
+    try{
+      const r = await fetch(url);
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const w = await r.json();
+      return JSON.parse(w.contents);
+    }catch(e){
+      if(i===retries-1) throw e;
+      await new Promise(res=>setTimeout(res, 1500*(i+1)));
+    }
+  }
 }
 
-function etaClass(m) {
-  if (m<=1) return 'eta-now'; if (m<=5) return 'eta-soon'; if (m<=15) return 'eta-ok'; return 'eta-future';
-}
+/* ── Status helper ── */
+const statusEl = document.getElementById('status-msg');
+function setStatus(msg){ statusEl.textContent = msg; }
 
-function buildSchedule(routeStops, now) {
-  const stopOffsets = [];
-  let cumulative = 0;
-  for (const st of routeStops) {
-    if (!st.isActive) continue;
-    cumulative += (st.relativeTime || 0);
-    stopOffsets.push({ stopNumber: st.stopNumber, offsetSec: cumulative });
-  }
-  if (!stopOffsets.length) return null;
-  const tripDurationSec = stopOffsets[stopOffsets.length - 1].offsetSec;
-
-  const today = new Date(now);
-  const departures = [];
-  let h = FIRST_TRIP_HOUR, m = FIRST_TRIP_MINUTE;
-  while (h * 60 + m <= LAST_TRIP_HOUR * 60 + FIRST_TRIP_MINUTE) {
-    const dep = new Date(today);
-    dep.setHours(h, m, 0, 0);
-    departures.push(dep);
-    m += TRIP_INTERVAL_MIN;
-    h += Math.floor(m / 60);
-    m  = m % 60;
-  }
-
-  let activeDep = null, status = 'No service today';
-  for (const dep of departures) {
-    const end = new Date(dep.getTime() + tripDurationSec * 1000);
-    if (now >= dep && now <= end)  { activeDep = dep; status = 'On route'; break; }
-    if (now < dep) { activeDep = dep; status = 'Next: ' + dep.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); break; }
-  }
-  if (!activeDep) return { status, nextStop:null, etaMinutes:null, progressPct:0 };
-
-  const arrivals = stopOffsets.map(s => ({
-    stopNumber: s.stopNumber,
-    arrivalTime: new Date(activeDep.getTime() + s.offsetSec * 1000),
-  }));
-  let nextStop = arrivals.find(a => a.arrivalTime > now) || arrivals[0];
-  const etaMin = Math.max(0, Math.round((nextStop.arrivalTime - now) / 60000));
-  const prog   = Math.min(100, Math.max(0, Math.round((now - activeDep) / (tripDurationSec*1000) * 100)));
-  return { status, nextStop, etaMinutes: etaMin, progressPct: prog };
-}
-
-/* ── Draw route shapes ── */
-/* Shape data fields: shapeNumber, shapePtLat, shapePtLon, shapePtSequence */
-function drawRoutes(shapesData, routesData) {
+/* ── Draw route polylines ── */
+/* Shape point fields: shapeNumber, shapePtLat, shapePtLon, shapePtSequence */
+function drawRoutes(shapes, routes){
   const colMap = {};
-  routesData.forEach(r => { colMap[r.shapeNumber] = { colour: r.colour||'#888', num: r.routeNumber }; });
+  routes.forEach(r=>{ colMap[r.shapeNumber]={colour:r.colour||'#888',num:r.routeNumber}; });
 
-  const groups = {};
-  shapesData.forEach(pt => {
-    const key = pt.shapeNumber;
-    if (!groups[key]) groups[key] = [];
+  const grp = {};
+  shapes.forEach(pt=>{
+    const k = pt.shapeNumber;
     const lat = parseFloat(pt.shapePtLat);
     const lng = parseFloat(pt.shapePtLon);
-    if (!isNaN(lat) && !isNaN(lng)) groups[key].push([lat, lng]);
+    if(isNaN(lat)||isNaN(lng)) return;
+    if(!grp[k]) grp[k]=[];
+    grp[k].push([lat,lng]);
   });
 
-  Object.entries(groups).forEach(([key, coords]) => {
-    const info = colMap[parseInt(key)];
-    if (!info || info.num > 5 || coords.length < 2) return;
-    if (!routePolylines[key]) {
-      routePolylines[key] = L.polyline(coords,{color:info.colour,weight:5,opacity:0.85}).addTo(map);
-    }
+  Object.entries(grp).forEach(([k,coords])=>{
+    const info = colMap[+k];
+    if(!info||info.num>5||coords.length<2||polylines[k]) return;
+    polylines[k] = L.polyline(coords,{color:info.colour,weight:5,opacity:.85}).addTo(map);
   });
 }
 
-function drawStops(stopsData, activeNums) {
-  const set = new Set(activeNums.map(String));
-  stopsData.forEach(s => {
-    if (!s.latitude || !set.has(String(s.stopNumber))) return;
+/* ── Draw stop dots ── */
+function drawStops(stops, activeSet){
+  stops.forEach(s=>{
+    if(!s.latitude||!activeSet.has(String(s.stopNumber))) return;
     L.circleMarker([s.latitude,s.longitude],{
-      radius:4,color:'#fff',weight:1,fillColor:'#1e3a6e',fillOpacity:0.9
+      radius:4,color:'#fff',weight:1,fillColor:'#1e3a6e',fillOpacity:.9
     }).bindTooltip(s.stopName,{direction:'top'}).addTo(map);
   });
 }
 
-function busIcon(colour,text,num) {
-  const s = `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
-    <circle cx="18" cy="18" r="17" fill="${colour}" stroke="#fff" stroke-width="2"/>
+/* ── Bus SVG icon ── */
+function busIcon(c,t,n){
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+    <circle cx="18" cy="18" r="17" fill="${c}" stroke="#fff" stroke-width="2"/>
     <text x="18" y="23" text-anchor="middle" font-size="14" font-weight="900"
-          font-family="Arial,sans-serif" fill="${text}">${num}</text></svg>`;
-  return L.divIcon({html:s,className:'',iconSize:[36,36],iconAnchor:[18,18],popupAnchor:[0,-20]});
+    font-family="Arial,sans-serif" fill="${t}">${n}</text></svg>`;
+  return L.divIcon({html:svg,className:'',iconSize:[36,36],iconAnchor:[18,18],popupAnchor:[0,-20]});
 }
 
-async function fetchAndRender() {
-  const [stopsArr, routesArr, shapesArr] = await Promise.all([
-    apiFetch('/stops/'    + AGENCY_ID),
-    apiFetch('/routes/0/' + AGENCY_ID),
-    apiFetch('/shapes/'   + AGENCY_ID),
-  ]);
+/* ── Load static map data (shapes, routes, stops) ── */
+async function loadMapData(){
+  setStatus('Loading shapes…');
+  const shapes = await fetchJSON('/shapes/'+AGENCY);
+  setStatus('Loading routes…');
+  routesData   = await fetchJSON('/routes/0/'+AGENCY);
+  setStatus('Loading stops…');
+  stopsData    = await fetchJSON('/stops/'+AGENCY);
 
-  const stopMap = {};
-  stopsArr.forEach(s => { stopMap[String(s.stopNumber)] = s; });
+  stopMap = {};
+  stopsData.forEach(s=>{ stopMap[String(s.stopNumber)]=s; });
+  drawRoutes(shapes, routesData);
+  mapDataLoaded = true;
+  setStatus('');
+}
 
-  if (Object.keys(routePolylines).length === 0) drawRoutes(shapesArr, routesArr);
+/* ── Schedule engine ── */
+function buildSchedule(routeStops, now){
+  const offsets=[];
+  let cum=0;
+  for(const st of routeStops){
+    if(!st.isActive) continue;
+    cum += (st.relativeTime||0);
+    offsets.push({stopNumber:st.stopNumber,offsetSec:cum});
+  }
+  if(!offsets.length) return null;
+  const dur = offsets[offsets.length-1].offsetSec;
 
-  const now = new Date();
-  const results = [], activeNums = [];
-
-  for (const meta of ROUTES_META) {
-    const routeData  = routesArr.find(r => r.routeNumber === meta.number);
-    const routeStops = routeData ? (routeData.stops || []) : [];
-    const sched      = buildSchedule(routeStops, now);
-
-    let nextStopName=null, etaMinutes=null, tripStatus='No service today', progressPct=0;
-    let busLat=null, busLon=null;
-
-    if (sched) {
-      tripStatus   = sched.status;
-      etaMinutes   = sched.etaMinutes;
-      progressPct  = sched.progressPct;
-      if (sched.nextStop) {
-        const info = stopMap[String(sched.nextStop.stopNumber)];
-        nextStopName = info ? info.stopName : 'Stop #' + sched.nextStop.stopNumber;
-        if (info && info.latitude) { busLat=info.latitude; busLon=info.longitude; activeNums.push(sched.nextStop.stopNumber); }
-      }
-    }
-
-    if (busLat && busLon) {
-      const icon = busIcon(meta.colour, meta.text, meta.number);
-      if (busMarkers[meta.number]) {
-        busMarkers[meta.number].setLatLng([busLat,busLon]).setIcon(icon);
-      } else {
-        busMarkers[meta.number] = L.marker([busLat,busLon],{icon})
-          .bindPopup('<b>Route '+meta.number+'</b><br>'+(nextStopName||''))
-          .addTo(map);
-      }
-    }
-
-    routeStops.forEach(st => { if (st.isActive) activeNums.push(st.stopNumber); });
-    results.push({ route:meta, nextStopName, etaMinutes, tripStatus, progressPct });
+  /* Generate today's departure times */
+  const deps=[];
+  let h=FIRST_H, m=FIRST_M;
+  while(h*60+m <= LAST_H*60+FIRST_M){
+    const d=new Date(now); d.setHours(h,m,0,0); deps.push(d);
+    m+=INTERVAL; h+=Math.floor(m/60); m=m%60;
   }
 
-  if (!window._stopsDrawn) { drawStops(stopsArr, activeNums); window._stopsDrawn=true; }
-  renderCards(results);
-  updateTicker(results);
-  document.getElementById('last-update').textContent =
-    'Updated ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  let dep=null, status='No service today';
+  for(const d of deps){
+    const end=new Date(d.getTime()+dur*1000);
+    if(now>=d&&now<=end){ dep=d; status='On route'; break; }
+    if(now<d){ dep=d; status='Next: '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); break; }
+  }
+  if(!dep) return {status,nextStop:null,etaMin:null,prog:0};
+
+  const arrivals=offsets.map(o=>({
+    stopNumber:o.stopNumber,
+    arrives:new Date(dep.getTime()+o.offsetSec*1000)
+  }));
+  const next = arrivals.find(a=>a.arrives>now)||arrivals[0];
+  const etaMin = Math.max(0,Math.round((next.arrives-now)/60000));
+  const prog   = Math.min(100,Math.max(0,Math.round((now-dep)/(dur*1000)*100)));
+  return {status,nextStop:next,etaMin,prog};
 }
 
-function renderCards(results) {
-  const c = document.getElementById('route-cards');
-  c.innerHTML = '';
-  results.forEach(({route,nextStopName,etaMinutes,tripStatus,progressPct}) => {
-    const card = document.createElement('div');
-    card.className = 'route-card';
-    const etaC   = etaMinutes!==null ? etaClass(etaMinutes) : 'eta-future';
-    const etaNum = etaMinutes!==null ? (etaMinutes===0?'&#9733;':etaMinutes) : '&mdash;';
-    const bar    = nextStopName
-      ? `<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${progressPct}%;background:${route.colour};"></div></div>` : '';
-    card.innerHTML = `
+/* ── eta colour ── */
+function etaC(m){ return m<=1?'en':m<=5?'es':m<=15?'eo':'ef'; }
+
+/* ── Render sidebar ── */
+function renderCards(results){
+  const c=document.getElementById('cards');
+  c.innerHTML='';
+  results.forEach(({route,stopName,etaMin,status,prog})=>{
+    const div=document.createElement('div'); div.className='route-card';
+    const ec = etaMin!==null?etaC(etaMin):'ef';
+    const en = etaMin!==null?(etaMin===0?'&#9733;':etaMin):'&mdash;';
+    const bar= stopName?`<div class="pb-w"><div class="pb-f" style="width:${prog}%;background:${route.c}"></div></div>`:'';
+    div.innerHTML=`
       <div class="route-header">
-        <div class="route-badge" style="background:${route.colour};color:${route.text};">${route.number}</div>
-        <div class="route-info"><h2>${route.name}</h2><div class="status-line">${tripStatus}</div></div>
+        <div class="route-badge" style="background:${route.c};color:${route.t}">${route.n}</div>
+        <div class="route-info"><h2>${route.name}</h2><div class="sl">${status}</div></div>
       </div>
-      <div class="stop-section">
-        <div class="stop-label">Next Stop</div>
-        ${nextStopName
-          ? `<div class="next-stop-name">${nextStopName}</div>
+      <div class="stop-sec">
+        <div class="stop-lbl">Next Stop</div>
+        ${stopName
+          ?`<div class="next-sn">${stopName}</div>
              <div class="eta-row">
-               <span class="eta-minutes ${etaC}">${etaNum}</span>
-               <span class="eta-label">${etaMinutes===0?'Arriving':'min away'}</span>
+               <span class="eta-num ${ec}">${en}</span>
+               <span class="eta-lbl">${etaMin===0?'Arriving':'min away'}</span>
              </div>${bar}`
-          : `<div class="no-bus">${tripStatus}</div>`
+          :`<div class="no-bus">${status}</div>`
         }
       </div>`;
-    c.appendChild(card);
+    c.appendChild(div);
   });
 }
 
-function updateTicker(results) {
-  document.getElementById('ticker-text').textContent =
-    results.map(({route,nextStopName,etaMinutes}) =>
-      `Route ${route.number}: ${nextStopName||'No active trip'} – ${etaMinutes!==null?etaMinutes+' min':'TBD'}`
+function updateTicker(results){
+  document.getElementById('ticker').textContent =
+    results.map(({route,stopName,etaMin})=>
+      `Route ${route.n}: ${stopName||'No active trip'} – ${etaMin!==null?etaMin+' min':'TBD'}`
     ).join('   ·   ');
 }
 
-async function refresh() {
-  try { await fetchAndRender(); }
-  catch(e) {
-    console.error('Refresh error:',e);
-    document.getElementById('last-update').textContent='Update failed – retrying in 60s';
+/* ── Main refresh ── */
+async function refresh(){
+  if(!mapDataLoaded){
+    document.getElementById('last-update').textContent='Map data not ready yet…';
+    return;
   }
+  const now     = new Date();
+  const results = [];
+  const active  = new Set();
+
+  for(const route of ROUTES){
+    const rd    = routesData.find(r=>r.routeNumber===route.n);
+    const stops = rd?(rd.stops||[]):[];
+    const sched = buildSchedule(stops,now);
+    let stopName=null, etaMin=null, status='No service', prog=0;
+    let lat=null, lng=null;
+
+    if(sched){
+      status=sched.status; etaMin=sched.etaMin; prog=sched.prog;
+      if(sched.nextStop){
+        const info=stopMap[String(sched.nextStop.stopNumber)];
+        stopName=info?info.stopName:'Stop #'+sched.nextStop.stopNumber;
+        if(info&&info.latitude){ lat=info.latitude; lng=info.longitude; active.add(String(info.stopNumber)); }
+      }
+    }
+
+    /* Update bus marker */
+    if(lat&&lng){
+      const icon=busIcon(route.c,route.t,route.n);
+      if(markers[route.n]){ markers[route.n].setLatLng([lat,lng]).setIcon(icon); }
+      else{ markers[route.n]=L.marker([lat,lng],{icon}).bindPopup('<b>Route '+route.n+'</b><br>'+(stopName||'')).addTo(map); }
+    }
+
+    /* Collect all active stop numbers for this route */
+    stops.forEach(st=>{ if(st.isActive) active.add(String(st.stopNumber)); });
+    results.push({route,stopName,etaMin,status,prog});
+  }
+
+  /* Draw stops once after first successful refresh */
+  if(!window._stopsDrawn){ drawStops(stopsData,active); window._stopsDrawn=true; }
+
+  renderCards(results);
+  updateTicker(results);
+  document.getElementById('last-update').textContent=
+    'Updated '+now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
-refresh();
-setInterval(refresh, REFRESH_MS);
+
+/* ── Bootstrap ── */
+(async function init(){
+  try{
+    await loadMapData();
+    await refresh();
+    setInterval(refresh, REFRESH_MS);
+    /* Re-fetch static data every MAP_REFRESH ms */
+    setInterval(async()=>{
+      try{
+        setStatus('Refreshing map data…');
+        const shapes = await fetchJSON('/shapes/'+AGENCY);
+        routesData   = await fetchJSON('/routes/0/'+AGENCY);
+        stopsData    = await fetchJSON('/stops/'+AGENCY);
+        stopMap={}; stopsData.forEach(s=>{stopMap[String(s.stopNumber)]=s;});
+        setStatus('');
+      }catch(e){ setStatus('Map refresh failed'); }
+    }, MAP_REFRESH);
+  }catch(e){
+    console.error('Init error:',e);
+    document.getElementById('last-update').textContent='Failed to load – check console';
+    setStatus(e.message||'Error');
+  }
+})();
 </script>
 </body>
 </html>
